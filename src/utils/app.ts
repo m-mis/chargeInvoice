@@ -1,5 +1,5 @@
 const getAppUrl = () => {
-  if (!process.env.app_url) throw new Error("App URL is not set");
-  return process.env.app_url;
+  if (!process.env.APP_URL) throw new Error("App URL is not set");
+  return process.env.APP_URL;
 };
 export const appUrl = getAppUrl();

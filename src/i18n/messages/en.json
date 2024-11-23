@@ -1,0 +1,12 @@
+{
+  "HomePage": {
+    "title": "Hello world!"
+  },
+  "ErrorPage": {
+    "title": "Error",
+    "code": {
+      "tscbnc": "No code provided",
+      "tscbns": "No state provided"
+    }
+  }
+}

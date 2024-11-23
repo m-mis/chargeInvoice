@@ -16,22 +16,22 @@ enum TeslaApiScopes {
 }
 
 const getClientId = () => {
-  if (!process.env.tesla_api_client_id) throw new Error("Tesla API client ID is not set");
-  return process.env.tesla_api_client_id;
+  if (!process.env.TESLA_API_CLIENT_ID) throw new Error("Tesla API client ID is not set");
+  return process.env.TESLA_API_CLIENT_ID;
 };
 const getClientSecret = () => {
-  if (!process.env.tesla_api_client_secret) throw new Error("Tesla API client secret is not set");
-  return process.env.tesla_api_client_secret;
+  if (!process.env.TESLA_API_CLIENT_SECRET) throw new Error("Tesla API client secret is not set");
+  return process.env.TESLA_API_CLIENT_SECRET;
 };
 
 const getScopes = (scopes: TeslaApiScopes[]) => {
   return scopes.join(" ");
 };
 
-const getUserAuthUrl = () => {
+const getUserAuthUrl = (callbackUrl: string) => {
   const url = new URL(`${TeslaApiEndpoints.AUTH}/oauth2/v3/authorize`);
   url.searchParams.set("client_id", getClientId());
-  url.searchParams.set("redirect_uri", `${appUrl}/signinAuth`);
+  url.searchParams.set("redirect_uri", callbackUrl);
   url.searchParams.set("response_type", "code");
   url.searchParams.set("scope", getScopes([TeslaApiScopes.OFFLINE_ACCESS, TeslaApiScopes.USER_DATA, TeslaApiScopes.VEHICLE_CHARGING_CMDS]));
   url.searchParams.set("state", "signin");
@@ -103,7 +103,7 @@ const getChargingInvoice = async (userInfo: ApiRequest, contentId: string) => {
 };
 
 export const tesla = {
-  userAuthUrl: getUserAuthUrl(),
+  getUserAuthUrl: getUserAuthUrl,
   codeExchangeUrl: getCodeExchangeUrl,
   getUserInfo,
   getChargingHistory,
