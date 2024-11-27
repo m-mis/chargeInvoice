@@ -1,6 +1,10 @@
+import { TeslaApiRegion } from "@/providers/tesla";
+
 export type UserSession = {
-  accessToken: string;
-  refreshToken: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  region: TeslaApiRegion;
 };
 
 export type ApiRequest = {

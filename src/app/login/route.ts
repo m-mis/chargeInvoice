@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
-import { tesla } from "@/providers/tesla";
+import { appUrl } from "@/utils/app";
+import { getUserAuthUrl } from "@/providers/tesla";
 
 export const GET = async () => {
-  return redirect(tesla.getUserAuthUrl("/login/callback"));
+  console.log(`${appUrl}/login/callback`);
+  return redirect(getUserAuthUrl(`${appUrl}/login/callback`));
 };

@@ -13,11 +13,16 @@ datasource db {
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
-  teslaAccountId   String?   @unique
+  emailHash     String   @unique
   name      String?
+  nameHash      String?
+  teslaAccountId   String?   @unique
+  teslaVaultId   String?
+  region String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   sessions  UserSession[]
+  chargingSessions ChargingSession[]
 }
 
 model UserSession {
@@ -29,4 +34,59 @@ model UserSession {
   expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ChargingSession {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  sessionId Int
+  vin String?
+  siteLocationName String?
+  chargeStartDateTime DateTime?
+  chargeStopDateTime DateTime?
+  unlatchDateTime DateTime?
+  countryCode String?
+  billingType String?
+  vehicleMakeType String?
+  fees ChargingFee[]
+  invoices ChargingInvoice[]
+}
+
+model ChargingFee {
+  id        String   @id @default(uuid())
+  chargingSessionId String
+  chargingSession ChargingSession @relation(fields: [chargingSessionId], references: [id])
+  feeType String
+  currencyCode String
+  pricingType String
+  rateBase Float
+  rateTier1 Float
+  rateTier2 Float
+  rateTier3 Float?
+  rateTier4 Float?
+  usageBase Float
+  usageTier1 Float
+  usageTier2 Float
+  usageTier3 Float?
+  usageTier4 Float?
+  totalBase Float
+  totalTier1 Float
+  totalTier2 Float
+  totalTier3 Float?
+  totalTier4 Float?
+  totalDue Float
+  netDue Float
+  uom String?
+  isPaid Boolean
+  status String?
+}
+
+model ChargingInvoice {
+  id        String   @id @default(uuid())
+  chargingSessionId String
+  chargingSession ChargingSession @relation(fields: [chargingSessionId], references: [id])
+  contentId String
+  fileName String
+  invoiceType String
 }

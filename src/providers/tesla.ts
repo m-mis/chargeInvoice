@@ -1,6 +1,15 @@
-import { ApiRequest, UserSession, UserInfo } from "@/types/user";
-import { ChargingHistory, UserInfoResponse } from "@/types/tesla";
+import jwt from "jsonwebtoken";
+import { ChargingHistory, CodeExchange, GetChargingHistoryParams, TeslaBearerTokenData, UserInfoResponse } from "@/types/tesla";
 import { appUrl } from "@/utils/app";
+import PATHS from "@/app/path-config";
+
+export const MAX_PAGE_SIZE = 50;
+
+export enum TeslaApiRegion {
+  EU = "EU",
+  NA = "NA",
+  CN = "CN",
+}
 
 enum TeslaApiEndpoints {
   AUTH = "https://auth.tesla.com",
@@ -9,7 +18,7 @@ enum TeslaApiEndpoints {
   CN = "https://fleet-api.prd.cn.vn.cloud.tesla.com",
 }
 
-enum TeslaApiScopes {
+export enum TeslaApiScopes {
   OFFLINE_ACCESS = "offline_access",
   USER_DATA = "user_data",
   VEHICLE_CHARGING_CMDS = "vehicle_charging_cmds",
@@ -28,7 +37,7 @@ const getScopes = (scopes: TeslaApiScopes[]) => {
   return scopes.join(" ");
 };
 
-const getUserAuthUrl = (callbackUrl: string) => {
+export const getUserAuthUrl = (callbackUrl: string) => {
   const url = new URL(`${TeslaApiEndpoints.AUTH}/oauth2/v3/authorize`);
   url.searchParams.set("client_id", getClientId());
   url.searchParams.set("redirect_uri", callbackUrl);
@@ -38,7 +47,7 @@ const getUserAuthUrl = (callbackUrl: string) => {
   return url.toString();
 };
 
-const getCodeExchangeUrl = async (code: string): Promise<UserSession> => {
+const getCodeExchangeUrl = async (code: string): Promise<CodeExchange> => {
   const url = new URL(`${TeslaApiEndpoints.AUTH}/oauth2/v3/token`);
 
   const body = {
@@ -46,7 +55,7 @@ const getCodeExchangeUrl = async (code: string): Promise<UserSession> => {
     client_id: getClientId(),
     client_secret: getClientSecret(),
     code,
-    redirect_uri: `${appUrl}/signinAuth`,
+    redirect_uri: `${appUrl}${PATHS.loginCallback}`,
   };
   const response = await fetch(url.toString(), {
     method: "POST",
@@ -55,57 +64,82 @@ const getCodeExchangeUrl = async (code: string): Promise<UserSession> => {
     },
     body: JSON.stringify(body),
   });
-  const data = await response.json();
-  return {
-    accessToken: data.access_token,
-    refreshToken: data.refresh_token,
+  return response.json();
+};
+
+export const refreshTeslaToken = async (refreshToken: string): Promise<CodeExchange> => {
+  const url = new URL(`${TeslaApiEndpoints.AUTH}/oauth2/v3/token`);
+  const body = {
+    grant_type: "refresh_token",
+    client_id: getClientId(),
+    client_secret: getClientSecret(),
+    refresh_token: refreshToken,
   };
-};
-
-const getBaseUrl = (region: ApiRequest["region"]) => {
-  return TeslaApiEndpoints[region.toUpperCase() as keyof typeof TeslaApiEndpoints];
-};
-
-const requestTeslaApi = async <T>(userInfo: ApiRequest, path: string, method: "GET" | "POST" = "GET", body?: unknown) => {
-  const url = new URL(`${getBaseUrl(userInfo.region)}/${path}`);
   const response = await fetch(url.toString(), {
-    method,
+    method: "POST",
     headers: {
-      Authorization: `Bearer ${userInfo.accessToken}`,
+      "Content-Type": "application/json",
     },
-    body: body ? JSON.stringify(body) : undefined,
+    body: JSON.stringify(body),
   });
-  return response.json() as Promise<T>;
+  return response.json();
 };
 
-const getUserInfo = async (userInfo: ApiRequest): Promise<UserInfo> => {
-  const response = await requestTeslaApi<UserInfoResponse>(userInfo, "api/1/users/me");
+const getBearerTokenData = (accessToken: string) => {
+  const decoded = jwt.decode(accessToken);
+  if (!decoded) throw new Error("Invalid access token");
+  return decoded as TeslaBearerTokenData;
+};
+
+export const Tesla = (region: TeslaApiRegion, accessToken: string) => {
+  const teslaUrl = TeslaApiEndpoints[region];
+
+  const requestTeslaApi = async <T>(path: string, method: "GET" | "POST" = "GET", data: { body?: unknown; query?: Record<string, string | number> } = {}) => {
+    if (data.query && data.query.pageSize && Number(data.query.pageSize) > MAX_PAGE_SIZE) data.query.pageSize = MAX_PAGE_SIZE.toString();
+    const url = new URL(`${teslaUrl}/${path}`);
+    if (data.query) {
+      Object.entries(data.query).forEach(([key, value]) => {
+        url.searchParams.set(key, value.toString());
+      });
+    }
+
+    const response = await fetch(url.toString(), {
+      method,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: data.body ? JSON.stringify(data.body) : undefined,
+    });
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+    return response.json() as Promise<T>;
+  };
+
+  const getUserInfo = async (): Promise<UserInfoResponse> => await requestTeslaApi<UserInfoResponse>("api/1/users/me");
+  const getChargingHistory = async (filters?: GetChargingHistoryParams) =>
+    await requestTeslaApi<ChargingHistory>("api/1/dx/charging/history", "GET", { query: filters });
+  const getChargingInvoice = async (contentId: string) => {
+    return fetch(`${teslaUrl}/api/1/dx/charging/invoice/${contentId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  };
 
   return {
-    id: response.response.vault_uuid,
-    email: response.response.email,
-    fullName: response.response.full_name,
-    accessToken: userInfo.accessToken,
-    refreshToken: userInfo.refreshToken,
-    region: userInfo.region,
+    ...getBearerTokenData(accessToken),
+    getUserInfo,
+    getChargingHistory,
+    getChargingInvoice,
   };
 };
-const getChargingHistory = async (userInfo: ApiRequest): Promise<ChargingHistory> => {
-  return await requestTeslaApi<ChargingHistory>(userInfo, "api/1/dx/charging/history");
-};
 
-const getChargingInvoice = async (userInfo: ApiRequest, contentId: string) => {
-  return fetch(`${getBaseUrl(userInfo.region)}/api/1/dx/charging/invoice/${contentId}`, {
-    headers: {
-      Authorization: `Bearer ${userInfo.accessToken}`,
-    },
-  });
-};
-
-export const tesla = {
-  getUserAuthUrl: getUserAuthUrl,
-  codeExchangeUrl: getCodeExchangeUrl,
-  getUserInfo,
-  getChargingHistory,
-  getChargingInvoice,
+export const TeslaInit = async (code: string) => {
+  const codeExchange = await getCodeExchangeUrl(code);
+  const bearerTokenData = getBearerTokenData(codeExchange.access_token);
+  return {
+    Tesla: Tesla(bearerTokenData.ou_code, codeExchange.access_token),
+    codeExchange,
+  };
 };

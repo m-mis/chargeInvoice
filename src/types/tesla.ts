@@ -1,3 +1,5 @@
+import { TeslaApiRegion, TeslaApiScopes } from "@/providers/tesla";
+
 export type UserRegionResponse = {
   response: {
     region: "eu" | "na" | "cn";
@@ -8,7 +10,7 @@ export type UserRegionResponse = {
   };
 };
 
-export type codeExchange = {
+export type CodeExchange = {
   access_token: string;
   refresh_token: string;
   id_token: string;
@@ -84,4 +86,31 @@ export type ChargingHistoryData = {
 export type ChargingHistory = {
   data: ChargingHistoryData[];
   totalResults: number;
+};
+
+export type TeslaBearerTokenData = {
+  iss: string;
+  azp: string;
+  sub: string;
+  aud: string[];
+  scp: TeslaApiScopes[];
+  amr: string[];
+  exp: number;
+  iat: 1732352765;
+  ou_code: TeslaApiRegion;
+  locale: string;
+  account_type: "business" | string;
+  open_source: boolean;
+  account_id: string;
+  auth_time: number;
+};
+
+export type GetChargingHistoryParams = {
+  endTime?: string;
+  pageNo?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortOrder?: string;
+  startTime?: string;
+  vin?: string;
 };

@@ -1,7 +1,9 @@
 import PATHS from "@/app/path-config";
 import { ERROR_CODES } from "@/error-codes";
-import { tesla } from "@/providers/tesla";
-import { cookies } from "next/headers";
+import { createUser, getUserByTeslaAccountId } from "@/models/user";
+import { createUserSession } from "@/models/user-session";
+import { TeslaApiRegion, TeslaInit } from "@/providers/tesla";
+import { setCookieSession } from "@/utils/cookies-manager";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
@@ -15,12 +17,28 @@ export async function GET(request: NextRequest) {
   if (!state) {
     return redirect(PATHS.errorCode(ERROR_CODES.tesla.callback.noState));
   }
-  console.log(code, state);
-  const userSession = await tesla.codeExchangeUrl(code as string);
 
-  console.log(userSession);
-  const cookiesStore = await cookies();
-  cookiesStore.set("accessToken", userSession.accessToken);
-  cookiesStore.set("refreshToken", userSession.refreshToken);
-  redirect("/tt");
+  const { Tesla, codeExchange } = await TeslaInit(code);
+
+  let newUser = false;
+  const teslaUserInfo = await Tesla.getUserInfo();
+  let user = await getUserByTeslaAccountId(Tesla.account_id);
+  if (!user) {
+    user = await createUser(teslaUserInfo.response.email, teslaUserInfo.response.full_name, Tesla.account_id, teslaUserInfo.response.vault_uuid, Tesla.ou_code);
+    newUser = true;
+  }
+
+  const userSessionPromise = createUserSession(user.id, codeExchange.access_token, codeExchange.refresh_token, codeExchange.expires_in);
+
+  const setCookieSessionPromise = setCookieSession({
+    userId: user.id,
+    userEmail: teslaUserInfo.response.email,
+    userName: teslaUserInfo.response.full_name,
+    region: user.region as TeslaApiRegion,
+  });
+
+  await Promise.all([userSessionPromise, setCookieSessionPromise]);
+  console.log("login/callback", await Tesla.getChargingHistory());
+
+  redirect(newUser ? PATHS.newUser : PATHS.home);
 }
