@@ -18,13 +18,12 @@ export async function GET(request: NextRequest) {
     return redirect(PATHS.errorCode(ERROR_CODES.tesla.callback.noState));
   }
 
-  const { Tesla, codeExchange } = await TeslaInit(code);
+  const { teslaUserInfo, codeExchange, account_id, ou_code } = await TeslaInit(code);
 
   let newUser = false;
-  const teslaUserInfo = await Tesla.getUserInfo();
-  let user = await getUserByTeslaAccountId(Tesla.account_id);
+  let user = await getUserByTeslaAccountId(account_id);
   if (!user) {
-    user = await createUser(teslaUserInfo.response.email, teslaUserInfo.response.full_name, Tesla.account_id, teslaUserInfo.response.vault_uuid, Tesla.ou_code);
+    user = await createUser(teslaUserInfo.response.email, teslaUserInfo.response.full_name, account_id, teslaUserInfo.response.vault_uuid, ou_code);
     newUser = true;
   }
 
@@ -38,7 +37,7 @@ export async function GET(request: NextRequest) {
   });
 
   await Promise.all([userSessionPromise, setCookieSessionPromise]);
-  console.log("login/callback", await Tesla.getChargingHistory());
+  // console.log("login/callback", await Tesla.getChargingHistory());
 
   redirect(newUser ? PATHS.newUser : PATHS.home);
 }

@@ -56,7 +56,7 @@ model ChargingSession {
 model ChargingFee {
   id        String   @id @default(uuid())
   chargingSessionId String
-  chargingSession ChargingSession @relation(fields: [chargingSessionId], references: [id])
+  chargingSession ChargingSession @relation(fields: [chargingSessionId], references: [id], onDelete: Cascade)
   feeType String
   currencyCode String
   pricingType String
@@ -85,7 +85,7 @@ model ChargingFee {
 model ChargingInvoice {
   id        String   @id @default(uuid())
   chargingSessionId String
-  chargingSession ChargingSession @relation(fields: [chargingSessionId], references: [id])
+  chargingSession ChargingSession @relation(fields: [chargingSessionId], references: [id], onDelete: Cascade)
   contentId String
   fileName String
   invoiceType String

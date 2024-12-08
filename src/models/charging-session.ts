@@ -1,24 +1,19 @@
 import { ChargingHistory, GetChargingHistoryParams } from "@/types/tesla";
-import { getCookieSession } from "@/utils/cookies-manager";
-import { redirect } from "next/navigation";
 import { getLastUserSession } from "./user-session";
-import PATHS from "@/app/path-config";
-import { Tesla } from "@/providers/tesla";
+import { Tesla, TeslaApiRegion } from "@/providers/tesla";
 import prisma from "@/db";
 import { Prisma } from "@prisma/client";
 
-export const fetchChargingSessionsAndSave = async (filters?: GetChargingHistoryParams) => {
-  console.log("fetchChargingHistory");
-  const cookieSession = await getCookieSession();
-  if (!cookieSession) redirect(PATHS.login);
-  const session = await getLastUserSession(cookieSession.userId);
-  if (!session) redirect(PATHS.login);
-  const tesla = Tesla(cookieSession.region, session.accessToken);
-  const data = await tesla.getChargingHistory(filters);
-  const dataCreated = await createChargingSession(data, cookieSession.userId);
+export const fetchChargingSessionsAndSave = async (userId: string, filters?: GetChargingHistoryParams) => {
+  const session = await getLastUserSession(userId);
+  if (!session) throw new Error("User session not found");
+  const tesla = Tesla({ id: session.userId, region: session.user.region as TeslaApiRegion }, session);
+  const data = await tesla.getChargingHistory(filters); // TODO: handle errors
+  const dataCreated = await createChargingSession(data, userId);
   return {
     totalResults: data.totalResults,
     ...dataCreated,
+    data: data.data,
   };
 };
 // const mapChargingHistoryDataToChargingSession = (data: ChargingHistoryData, userId: string) => {
@@ -32,6 +27,15 @@ export const fetchChargingSessionsAndSave = async (filters?: GetChargingHistoryP
 
 const createChargingSession = async (data: ChargingHistory, userId: string) => {
   const { data: chargingHistoryData } = data;
+  if (!chargingHistoryData)
+    return {
+      chargingSessions: 0,
+      chargingSessionsIds: [],
+      chargingFees: 0,
+      chargingFeesIds: [],
+      chargingInvoices: [],
+      chargingInvoicesIds: [],
+    };
   const chargeSessionCreateData: Prisma.ChargingSessionCreateManyInput[] = chargingHistoryData.map((item) => ({
     vin: item.vin,
     userId,
@@ -88,8 +92,11 @@ const createChargingSession = async (data: ChargingHistory, userId: string) => {
     })
   );
 
-  const createdChargingFeesPromise = prisma.chargingFee.createMany({
+  const createdChargingFeesPromise = prisma.chargingFee.createManyAndReturn({
     data: chargingFeeData.flat(),
+    select: {
+      id: true,
+    },
   });
 
   const chargingInvoiceData: Prisma.ChargingInvoiceCreateManyInput[][] = chargingHistoryData.map((item) =>
@@ -104,14 +111,50 @@ const createChargingSession = async (data: ChargingHistory, userId: string) => {
     })
   );
 
-  const createdChargingInvoicesPromise = prisma.chargingInvoice.createMany({
+  const createdChargingInvoicesPromise = prisma.chargingInvoice.createManyAndReturn({
     data: chargingInvoiceData.flat(),
+    select: {
+      id: true,
+      contentId: true,
+      fileName: true,
+    },
   });
 
   const [createdChargingFees, createdChargingInvoices] = await Promise.all([createdChargingFeesPromise, createdChargingInvoicesPromise]);
   return {
     chargingSessions: chargingSessionIds.length,
-    chargingFees: createdChargingFees.count,
-    chargingInvoices: createdChargingInvoices.count,
+    chargingSessionsIds: chargingSessionIds.map((item) => item.id),
+    chargingFees: createdChargingFees.length,
+    chargingFeesIds: createdChargingFees.map((item) => item.id),
+    chargingInvoices: createdChargingInvoices,
+    chargingInvoicesIds: createdChargingInvoices.map((item) => item.id),
   };
+};
+
+export const fetchNewChargingSessions = async (userId: string) => {
+  // const session = await getLastUserSession(userId);
+  // if (!session) throw new Error("User session not found");
+  // const tesla = Tesla(session.user.region as TeslaApiRegion, session.accessToken);
+
+  const lastChargingSession = await prisma.chargingSession.findFirst({
+    where: {
+      userId,
+    },
+    orderBy: {
+      chargeStartDateTime: "desc",
+    },
+  });
+
+  const lastChargingSessionDate = lastChargingSession?.unlatchDateTime ?? null;
+
+  return await fetchChargingSessionsAndSave(userId, {
+    startTime: lastChargingSessionDate ?? undefined,
+    endTime: new Date(),
+  });
+};
+
+export const deleteChargingSession = async (id: string) => {
+  await prisma.chargingSession.delete({
+    where: { id },
+  });
 };

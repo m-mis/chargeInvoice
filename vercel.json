@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/webhook/cron/fetch",
+      "schedule": "17 0 * * *"
+    }
+  ]
+}

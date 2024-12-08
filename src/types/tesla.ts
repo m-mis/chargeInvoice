@@ -84,7 +84,7 @@ export type ChargingHistoryData = {
 };
 
 export type ChargingHistory = {
-  data: ChargingHistoryData[];
+  data: ChargingHistoryData[] | null;
   totalResults: number;
 };
 
@@ -106,11 +106,11 @@ export type TeslaBearerTokenData = {
 };
 
 export type GetChargingHistoryParams = {
-  endTime?: string;
+  endTime?: Date;
   pageNo?: number;
   pageSize?: number;
   sortBy?: string;
   sortOrder?: string;
-  startTime?: string;
+  startTime?: Date;
   vin?: string;
 };
