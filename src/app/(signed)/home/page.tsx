@@ -1,19 +1,20 @@
-import { tesla } from "@/providers/tesla";
-import { cookies } from "next/headers";
-import { FC } from "react";
-import { ChargingHistoryInvoice } from "@/types/tesla";
+// import { tesla } from "@/providers/tesla";
+// import { cookies } from "next/headers";
+// import { FC } from "react";
+// import { ChargingHistoryInvoice } from "@/types/tesla";
 
 export default async function Page() {
-  const cookiesStore = await cookies();
-  const accessToken = cookiesStore.get("accessToken")?.value ?? "";
-  const refreshToken = cookiesStore.get("refreshToken")?.value ?? "";
-  const chargingHistory = await tesla.getChargingHistory({
-    accessToken,
-    refreshToken,
-    region: "eu",
-  });
-  const charges = chargingHistory.data;
-  console.log({ chargingHistory });
+  // const cookiesStore = await cookies();
+  // const accessToken = cookiesStore.get("accessToken")?.value ?? "";
+  // const refreshToken = cookiesStore.get("refreshToken")?.value ?? "";
+  // const chargingHistory = await tesla.getChargingHistory({
+  //   accessToken,
+  //   refreshToken,
+  //   region: "eu",
+  // });
+  // const charges = chargingHistory.data;
+  // console.log({ chargingHistory });
+  const charges: unknown[] = [];
   return (
     <div>
       home page {charges.length}
@@ -30,7 +31,7 @@ export default async function Page() {
           </tr>
         </thead>
         <tbody>
-          {charges.map((charge) => (
+          {/* {charges.map((charge) => (
             <tr key={charge.sessionId}>
               <td>{charge.chargeStartDateTime}</td>
               <td>{charge.siteLocationName}</td>
@@ -40,21 +41,21 @@ export default async function Page() {
               <td>{charge.fees[0].totalBase}</td>
               <td>{<InvoiceName invoices={charge.invoices} accessToken={accessToken} />}</td>
             </tr>
-          ))}
+          ))} */}
         </tbody>
       </table>
     </div>
   );
 }
 
-const InvoiceName: FC<{ invoices: ChargingHistoryInvoice[]; accessToken: string }> = ({ invoices }) => {
-  return (
-    <div>
-      {invoices.map((invoice) => (
-        <a key={invoice.contentId} href={`/invoice/${invoice.contentId}`} className="text-blue-500 hover:underline" target="_blank">
-          {invoice.fileName}
-        </a>
-      ))}
-    </div>
-  );
-};
+// const InvoiceName: FC<{ invoices: ChargingHistoryInvoice[]; accessToken: string }> = ({ invoices }) => {
+//   return (
+//     <div>
+//       {invoices.map((invoice) => (
+//         <a key={invoice.contentId} href={`/invoice/${invoice.contentId}`} className="text-blue-500 hover:underline" target="_blank">
+//           {invoice.fileName}
+//         </a>
+//       ))}
+//     </div>
+//   );
+// };
