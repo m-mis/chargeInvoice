@@ -7,7 +7,7 @@ import { blobToBuffer } from "@/utils/blob";
 
 const resend = new Resend(process.env.EMAIL_RESEND_API_KEY);
 
-export const POST = async (request: NextRequest) => {
+export const GET = async (request: NextRequest) => {
   //TODO check authorization
   const authHeader = request.headers.get("authorization");
   if (!authHeader || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
