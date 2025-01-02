@@ -5,6 +5,11 @@ const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   /* config options here */
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
 };
 
 export default withNextIntl(nextConfig);
