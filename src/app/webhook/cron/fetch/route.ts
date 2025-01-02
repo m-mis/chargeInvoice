@@ -22,7 +22,6 @@ export const GET = async (request: NextRequest) => {
     .filter((user) => user && user.chargingSessions.totalResults > 0)
     .map(async (user) => {
       if (!user) return;
-
       const tesla = Tesla(user, user.session);
       const invoicesPDFs = user.chargingSessions.chargingInvoices.map((item) => ({
         fileName: item.fileName,

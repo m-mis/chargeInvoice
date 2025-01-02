@@ -96,7 +96,7 @@ const getBearerTokenData = (accessToken: string) => {
 export const Tesla = (user: { id: string; region: TeslaApiRegion }, token: { accessToken: string; refreshToken: string; expiresAt: Date }) => {
   const teslaUrl = TeslaApiEndpoints[user.region];
 
-  const requestTeslaApi = async <T>(path: string, method: "GET" | "POST" = "GET", data: { body?: unknown; query?: Record<string, string | number> } = {}) => {
+  const requestTeslaAiRaw = async (path: string, method: "GET" | "POST" = "GET", data: { body?: unknown; query?: Record<string, string | number> } = {}) => {
     if (token.expiresAt < new Date()) {
       token = await refreshUserSession(user.id, token.refreshToken);
     }
@@ -116,7 +116,13 @@ export const Tesla = (user: { id: string; region: TeslaApiRegion }, token: { acc
         Authorization: `Bearer ${token.accessToken}`,
       },
       body: data.body ? JSON.stringify(data.body) : undefined,
+      cache: "no-store",
     });
+    return response;
+  };
+
+  const requestTeslaApi = async <T>(path: string, method: "GET" | "POST" = "GET", data: { body?: unknown; query?: Record<string, string | number> } = {}) => {
+    const response = await requestTeslaAiRaw(path, method, data);
     if (!response.ok) {
       throw new Error(response.statusText);
     }
@@ -136,11 +142,7 @@ export const Tesla = (user: { id: string; region: TeslaApiRegion }, token: { acc
     return await requestTeslaApi<ChargingHistory>("api/1/dx/charging/history", "GET", { query });
   };
   const getChargingInvoice = async (contentId: string) => {
-    const response = await fetch(`${teslaUrl}/api/1/dx/charging/invoice/${contentId}`, {
-      headers: {
-        Authorization: `Bearer ${token.accessToken}`,
-      },
-    });
+    const response = await requestTeslaAiRaw(`api/1/dx/charging/invoice/${contentId}`, "GET");
     return response.blob();
   };
 
