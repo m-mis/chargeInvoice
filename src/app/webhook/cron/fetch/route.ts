@@ -23,10 +23,11 @@ export const GET = async (request: NextRequest) => {
     .map(async (user) => {
       if (!user) return;
       const tesla = Tesla(user, user.session);
-      const invoicesPDFs = user.chargingSessions.chargingInvoices.map((item) => ({
+      const invoicesPDFsRequests = user.chargingSessions.chargingInvoices.map(async (item) => ({
         fileName: item.fileName,
-        pdfBlob: tesla.getChargingInvoice(item.contentId),
+        pdfBlob: await tesla.getChargingInvoice(item.contentId),
       }));
+      const invoicesPDFs = await Promise.all(invoicesPDFsRequests);
       const invoicesPDFsAttachments = await Promise.all(
         invoicesPDFs.map(async (invoiceData) => ({
           filename: invoiceData.fileName,
