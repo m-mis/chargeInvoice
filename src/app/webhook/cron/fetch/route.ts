@@ -5,6 +5,8 @@ import { Tesla } from "@/providers/tesla";
 import { NextRequest, NextResponse } from "next/server";
 import { blobToBuffer } from "@/utils/blob";
 
+export const maxDuration = 60;
+
 const resend = new Resend(process.env.EMAIL_RESEND_API_KEY);
 
 export const GET = async (request: NextRequest) => {
