@@ -1,9 +1,11 @@
 const paths = {
   home: "/",
-  newUser: "/new-user",
   login: "/login",
   loginCallback: "/login/callback",
   error: "/error",
+  dashboard: "/dashboard",
+  newUser: "/dashboard/new-user",
+  invoice: "/dashboard/invoice",
 } as const;
 
 const errorMessage = (errorMessage: string) => `${paths.error}?error=${encodeURIComponent(errorMessage)}`;

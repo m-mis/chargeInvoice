@@ -158,3 +158,16 @@ export const deleteChargingSession = async (id: string) => {
     where: { id },
   });
 };
+
+export const getChargingSessions = async (userId: string) => {
+  return await prisma.chargingSession.findMany({
+    where: { userId },
+    orderBy: {
+      chargeStartDateTime: "desc",
+    },
+    include: {
+      invoices: true,
+      fees: true,
+    },
+  });
+};

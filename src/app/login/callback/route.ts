@@ -37,7 +37,6 @@ export async function GET(request: NextRequest) {
   });
 
   await Promise.all([userSessionPromise, setCookieSessionPromise]);
-  // console.log("login/callback", await Tesla.getChargingHistory());
 
-  redirect(newUser ? PATHS.newUser : PATHS.home);
+  redirect(newUser ? PATHS.newUser : PATHS.dashboard);
 }
