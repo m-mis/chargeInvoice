@@ -36,6 +36,7 @@ export const GET = async (request: NextRequest) => {
           content: await blobToBuffer(await invoiceData.pdfBlob),
         }))
       );
+
       try {
         const emailsend = await resend.emails.send({
           from: "invoices@polarwind.be",
