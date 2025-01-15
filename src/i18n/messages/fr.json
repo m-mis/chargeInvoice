@@ -1,0 +1,35 @@
+{
+  "HomePage": {
+    "login": "Se connecter",
+    "title": "Simplifiez la gestion de vos factures Tesla Superchargeur ⚡️",
+    "description": "Connectez votre compte Tesla à notre service en toute sécurité et recevez automatiquement un email quotidien regroupant vos factures de recharge Superchargeur.",
+    "benefits": "<ul><li>💼 <bold>Gagnez du temps</bold> : Plus besoin de chercher vos factures, elles viennent à vous.</li><li>🔒 <bold>Sécurité garantie</bold> : Vos données sont protégées et utilisées uniquement pour récupérer vos factures.</li><li>📩 <bold>Service automatisé</bold> : Recevez un email clair et organisé chaque jour avec toutes vos factures.</li></ul>",
+    "cta": "Commencez dès maintenant et concentrez-vous sur l’essentiel : vos trajets 🚗⚡️."
+  },
+  "ErrorPage": {
+    "title": "Error",
+    "code": {
+      "tscbnc": "No code provided",
+      "tscbns": "No state provided"
+    }
+  },
+  "Layout": {
+    "Menu": {
+      "invoices": "Factures",
+      "emails": "Emails"
+    },
+    "logout": "Déconnexion"
+  },
+  "ChargeTable": {
+    "date": "Date",
+    "location": "Lieu",
+    "kwh": "Kwh",
+    "amount": "Prix",
+    "invoice": "Facture"
+  },
+  "Emails": {
+    "title": "Emails",
+    "description": "Adresses emails auxquelles envoyer les factures",
+    "updateEmails": "Mettre à jour"
+  }
+}

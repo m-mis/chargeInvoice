@@ -19,6 +19,7 @@ model User {
   teslaAccountId   String?   @unique
   teslaVaultId   String?
   region String
+  emailSendTo String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   sessions  UserSession[]

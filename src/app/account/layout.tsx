@@ -10,5 +10,5 @@ export default async function Layout({ children, params }: { children: React.Rea
   }
   const locale = await params;
   console.log(locale);
-  return <DashboardLayout>{children}</DashboardLayout>;
+  return <DashboardLayout userName={cookieSession.userName}>{children}</DashboardLayout>;
 }

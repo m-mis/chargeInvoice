@@ -40,7 +40,7 @@ export const GET = async (request: NextRequest) => {
       try {
         const emailsend = await resend.emails.send({
           from: "invoices@polarwind.be",
-          to: user?.email,
+          to: user.emailSendTo ?? user.email,
           subject: "New charging sessions",
           html: "You have new Tesla charging sessions",
           attachments: invoicesPDFsAttachments,

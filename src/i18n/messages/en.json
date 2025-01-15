@@ -1,6 +1,10 @@
 {
   "HomePage": {
-    "title": "Hello world!"
+    "login": "Login",
+    "title": "Simplify the management of your Tesla Supercharger invoices ⚡️",
+    "description": "Securely connect your Tesla account to our service and automatically receive a daily email with all your Supercharger invoices.",
+    "benefits": "<ul><li>💼 <bold>Save time</bold>: No need to search for your invoices; they come to you.</li><li>🔒 <bold>Guaranteed security</bold>: Your data is protected and used only to retrieve your invoices.</li><li>📩 <bold>Automated service</bold>: Receive a clear and organized email every day with all your invoices.</li></ul>",
+    "cta": "Get started now and focus on what matters most: your journeys 🚗⚡️."
   },
   "ErrorPage": {
     "title": "Error",
@@ -8,5 +12,24 @@
       "tscbnc": "No code provided",
       "tscbns": "No state provided"
     }
+  },
+  "Layout": {
+    "Menu": {
+      "invoices": "Invoices",
+      "emails": "Emails"
+    },
+    "logout": "Logout"
+  },
+  "ChargeTable": {
+    "date": "Date",
+    "location": "Location",
+    "kwh": "Kwh",
+    "amount": "Amount",
+    "invoice": "Invoice"
+  },
+  "Emails": {
+    "title": "Emails",
+    "description": "Emails to send the invoice to",
+    "updateEmails": "Update Emails"
   }
 }

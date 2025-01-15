@@ -2,16 +2,23 @@
 import { TeslaApiRegion } from "@/providers/tesla";
 import { encrypt, hash, decrypt } from "@/utils/crypter";
 
-import { PrismaClient } from "@prisma/client";
 import { decodeUserSession } from "./user-session";
-const prisma = new PrismaClient();
+import prisma from "@/db";
 
-const decodeUser = <T extends { email: string; name?: string | null; region: string | null }>(user: T) => {
+const EMAIL_SEND_TO_SEPARATOR = ";";
+
+const decodeEmailSendTo = (emailSendTo: string | null | undefined) => {
+  if (!emailSendTo) return undefined;
+  return emailSendTo.split(EMAIL_SEND_TO_SEPARATOR).map((emailCrypt) => decrypt(emailCrypt.trim()));
+};
+
+const decodeUser = <T extends { email: string; name?: string | null; region: string | null; emailSendTo?: string | null }>(user: T) => {
   return {
     ...user,
     email: decrypt(user.email),
     name: user.name ? decrypt(user.name) : undefined,
     region: user.region as TeslaApiRegion,
+    emailSendTo: decodeEmailSendTo(user.emailSendTo),
   };
 };
 
@@ -67,4 +74,15 @@ export const getUserWithLastSession = async (userId: string) => {
     ...decodeUser(user),
     session: decodeUserSession(user.sessions[0]),
   };
+};
+
+export const getUserEmailsSendTo = async (userId: string) => {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  return decodeEmailSendTo(user?.emailSendTo);
+};
+
+export const updateUserEmailSendTo = async (userId: string, emailsSendTo: string[]) => {
+  const encryptedEmailsSendTo = emailsSendTo.map((email) => encrypt(email));
+  const emailSendTo = encryptedEmailsSendTo.join(EMAIL_SEND_TO_SEPARATOR);
+  await prisma.user.update({ where: { id: userId }, data: { emailSendTo } });
 };

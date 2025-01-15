@@ -2,34 +2,37 @@ import { FC } from "react";
 import { format } from "date-fns";
 import { ChargingSessionWithFeesAndInvoices } from "@/types/chargingSession";
 import PATHS from "@/app/path-config";
+import { useTranslations } from "next-intl";
 
 export const ChargesTable: FC<{ charges: ChargingSessionWithFeesAndInvoices[] }> = ({ charges }) => {
+  const t = useTranslations("ChargeTable");
   return (
     <div className="mt-8 flow-root">
       <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <div className="overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg">
-            <table className="min-w-full divide-y divide-gray-300">
-              <thead className="bg-gray-50">
+          <div className="overflow-hidden shadow ring-1 ring-black/5 sm:rounded-md ring-lightGray">
+            <table className="min-w-full divide-y divide-lightGray">
+              <thead className="bg-white">
                 <tr>
                   <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                    Name
+                    {t("date")}
                   </th>
                   <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    Title
+                    {t("location")}
                   </th>
                   <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    Email
+                    {t("kwh")}
                   </th>
                   <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    Role
+                    {t("amount")}
                   </th>
                   <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                    <span className="sr-only">Invoices</span>
+                    {/* <span className="sr-only">Invoices</span> */}
+                    {t("invoice")}
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
+              <tbody className="divide-y divide-lightGray bg-white">
                 {charges.map((charge) => (
                   <ChargeRow key={charge.id} charge={charge} />
                 ))}

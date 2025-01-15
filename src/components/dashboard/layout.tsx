@@ -1,9 +1,12 @@
 "use client";
 
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
 import PATHS from "@/app/path-config";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { changeLanguage, logout } from "./layout-actions";
+
 const user = {
   name: "Tom Cook",
   email: "tom@example.com",
@@ -11,86 +14,88 @@ const user = {
     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
 };
 const navigation = [
-  { name: "Dashboard", href: PATHS.dashboard },
-  { name: "New-user", href: PATHS.newUser },
+  { name: "invoices", href: PATHS.invoices },
+  // { name: "New-user", href: PATHS.newUser },
+  { name: "emails", href: PATHS.emails },
 ];
-const userNavigation = [
-  { name: "Your Profile", href: "#" },
-  { name: "Settings", href: "#" },
-  { name: "Sign out", href: "#" },
+
+const languages = [
+  { name: "English", code: "en" },
+  { name: "Français", code: "fr" },
 ];
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+export const DashboardLayout = ({ children, userName }: { children: React.ReactNode; userName: string }) => {
+  const t = useTranslations("Layout");
   return (
     <>
       <div className="min-h-full">
-        <Disclosure as="nav" className="border-b border-gray-200 bg-white">
+        <Disclosure as="nav" className="bg-white">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 justify-between">
-              <div className="flex">
-                <div className="flex shrink-0 items-center">
-                  <img
-                    alt="Your Company"
-                    src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-                    className="block h-8 w-auto lg:hidden"
-                    width={32}
-                    height={32}
-                  />
-                  <img
-                    alt="Your Company"
-                    src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-                    className="hidden h-8 w-auto lg:block"
-                    width={32}
-                    height={32}
-                  />
-                </div>
-                <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
-                  {navigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      // aria-current={item.current ? "page" : undefined}
-                      className={classNames("border-indigo-500 text-gray-900", "inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium")}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                </div>
+              <div className="flex shrink-0 items-center">
+                <a href={PATHS.dashboard} className="text-2xl font-bold">
+                  Charge invoice
+                </a>
+              </div>
+              <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8 sm:p-2">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    // aria-current={false ? "page" : undefined}
+                    className={classNames("text-black text-sm font-bold", "inline-flex items-center px-1 pt-1", "hover:bg-lightGray rounded-md")}
+                  >
+                    {t(`Menu.${item.name}`)}
+                  </Link>
+                ))}
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
-                <button
-                  type="button"
-                  className="relative rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon aria-hidden="true" className="size-6" />
-                </button>
+                <Menu as="div" className="relative ml-3">
+                  <MenuButton className="relative rounded-md p-1 text-black hover:bg-lightGray">
+                    <GlobeAltIcon aria-hidden="true" className="size-6" />
+                  </MenuButton>
+                  <MenuItems
+                    transition
+                    className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-sm bg-white py-1 shadow-lg ring-1 ring-lightGray transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-200 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                  >
+                    {languages.map((lang) => (
+                      <MenuItem key={lang.code}>
+                        <button
+                          className="block w-full px-4 py-2 text-sm text-gray data-[focus]:bg-gray-100 data-[focus]:outline-none hover:bg-lightGray"
+                          onClick={() => changeLanguage(lang.code)}
+                        >
+                          {lang.name}
+                        </button>
+                      </MenuItem>
+                    ))}
+                  </MenuItems>
+                </Menu>
 
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3">
                   <div>
-                    <MenuButton className="relative flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    <MenuButton className="relative flex max-w-xs items-center rounded-md text-black hover:bg-lightGray">
                       <span className="absolute -inset-1.5" />
                       <span className="sr-only">Open user menu</span>
-                      <img alt="" src={user.imageUrl} className="size-8 rounded-full" />
+                      <span className="text-sm text-black">{userName}</span>
                     </MenuButton>
                   </div>
                   <MenuItems
                     transition
-                    className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-200 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                    className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-lightGray transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-200 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
                   >
-                    {userNavigation.map((item) => (
-                      <MenuItem key={item.name}>
-                        <a href={item.href} className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none">
-                          {item.name}
-                        </a>
-                      </MenuItem>
-                    ))}
+                    <MenuItem>
+                      <button
+                        onClick={() => logout()}
+                        className="block w-full px-4 py-2 text-sm text-gray data-[focus]:bg-gray-100 data-[focus]:outline-none hover:bg-lightGray"
+                      >
+                        {t("logout")}
+                      </button>
+                    </MenuItem>
                   </MenuItems>
                 </Menu>
               </div>
@@ -114,7 +119,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
                   as="a"
                   href={item.href}
                   aria-current={"page"}
-                  className={classNames("border-indigo-500 bg-indigo-50 text-indigo-700", "block border-l-4 py-2 pl-3 pr-4 text-base font-medium")}
+                  className={classNames("block py-2 pl-3 pr-4 text-base font-medium")}
                 >
                   {item.name}
                 </DisclosureButton>
@@ -126,8 +131,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
                   <img alt="" src={user.imageUrl} className="size-10 rounded-full" />
                 </div>
                 <div className="ml-3">
-                  <div className="text-base font-medium text-gray-800">{user.name}</div>
-                  <div className="text-sm font-medium text-gray-500">{user.email}</div>
+                  <div className="text-base font-medium text-gray">{userName}</div>
                 </div>
                 <button
                   type="button"
@@ -135,20 +139,17 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
                 >
                   <span className="absolute -inset-1.5" />
                   <span className="sr-only">View notifications</span>
-                  <BellIcon aria-hidden="true" className="size-6" />
+                  <GlobeAltIcon aria-hidden="true" className="size-6" />
                 </button>
               </div>
               <div className="mt-3 space-y-1">
-                {userNavigation.map((item) => (
-                  <DisclosureButton
-                    key={item.name}
-                    as="a"
-                    href={item.href}
-                    className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                  >
-                    {item.name}
-                  </DisclosureButton>
-                ))}
+                <DisclosureButton
+                  as="button"
+                  className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                  onClick={() => logout()}
+                >
+                  {t("logout")}
+                </DisclosureButton>
               </div>
             </div>
           </DisclosurePanel>
