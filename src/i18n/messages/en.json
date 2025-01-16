@@ -6,6 +6,14 @@
     "benefits": "<ul><li>💼 <bold>Save time</bold>: No need to search for your invoices; they come to you.</li><li>🔒 <bold>Guaranteed security</bold>: Your data is protected and used only to retrieve your invoices.</li><li>📩 <bold>Automated service</bold>: Receive a clear and organized email every day with all your invoices.</li></ul>",
     "cta": "Get started now and focus on what matters most: your journeys 🚗⚡️."
   },
+  "NewUsePage": {
+    "title": "Hello {name}, welcome to Charge Invoice !",
+    "t&c": "Firstly, can you confirm that you have read and accepted the <a>Terms and Conditions</a>?",
+    "acceptT&C": "I accept the Terms and Conditions",
+    "fetchingSessions": "Fetching your charging sessions : {number}/{total}",
+    "fetchingSessionsCompleted": "Your charging sessions have been fetched successfully",
+    "updateUser": "Updating your account..."
+  },
   "ErrorPage": {
     "title": "Error",
     "code": {

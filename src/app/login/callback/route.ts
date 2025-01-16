@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
     userEmail: teslaUserInfo.response.email,
     userName: teslaUserInfo.response.full_name,
     region: user.region as TeslaApiRegion,
+    newUser: newUser,
   });
 
   await Promise.all([userSessionPromise, setCookieSessionPromise]);

@@ -6,6 +6,14 @@
     "benefits": "<ul><li>💼 <bold>Gagnez du temps</bold> : Plus besoin de chercher vos factures, elles viennent à vous.</li><li>🔒 <bold>Sécurité garantie</bold> : Vos données sont protégées et utilisées uniquement pour récupérer vos factures.</li><li>📩 <bold>Service automatisé</bold> : Recevez un email clair et organisé chaque jour avec toutes vos factures.</li></ul>",
     "cta": "Commencez dès maintenant et concentrez-vous sur l’essentiel : vos trajets 🚗⚡️."
   },
+  "NewUsePage": {
+    "title": "Bonjour {name}, bienvenue sur Charge Invoice !",
+    "t&c": "Tout d'abord, pouvez-vous confirmer que vous avez lu et accepté les <a>Conditions d'utilisation</a> ?",
+    "acceptT&C": "Je valide les conditions d'utilisation",
+    "fetchingSessions": "Récupération de vos sessions de recharge : {number}/{total}",
+    "fetchingSessionsCompleted": "Vos sessions de recharge ont été récupérées avec succès",
+    "updateUser": "Mise à jour de votre compte..."
+  },
   "ErrorPage": {
     "title": "Error",
     "code": {

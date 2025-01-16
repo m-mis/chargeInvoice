@@ -37,9 +37,9 @@ export const DashboardLayout = ({ children, userName }: { children: React.ReactN
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 justify-between">
               <div className="flex shrink-0 items-center">
-                <a href={PATHS.dashboard} className="text-2xl font-bold">
+                <Link href={PATHS.dashboard} className="text-2xl font-bold">
                   Charge invoice
-                </a>
+                </Link>
               </div>
               <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8 sm:p-2">
                 {navigation.map((item) => (

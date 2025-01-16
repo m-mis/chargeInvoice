@@ -12,6 +12,7 @@ datasource db {
 
 model User {
   id        String   @id @default(uuid())
+  userNumber Int @default(autoincrement())
   email     String   @unique
   emailHash     String   @unique
   name      String?
@@ -24,6 +25,9 @@ model User {
   updatedAt DateTime @updatedAt
   sessions  UserSession[]
   chargingSessions ChargingSession[]
+  termsAndConditionsVersion String?
+  termsAndConditionsAcceptedAt DateTime?
+  firstDownloadCompletedAt DateTime?
 }
 
 model UserSession {

@@ -99,8 +99,9 @@ const createChargingSession = async (data: ChargingHistory, userId: string) => {
     },
   });
 
-  const chargingInvoiceData: Prisma.ChargingInvoiceCreateManyInput[][] = chargingHistoryData.map((item) =>
-    item.invoices.map((invoice) => {
+  const chargingInvoiceData: Prisma.ChargingInvoiceCreateManyInput[][] = chargingHistoryData.map((item) => {
+    const invoices = item.invoices ? item.invoices : [];
+    return invoices.map((invoice) => {
       const data: Prisma.ChargingInvoiceCreateManyInput = {
         chargingSessionId: chargingSessionIdsMap[item.sessionId],
         contentId: invoice.contentId,
@@ -108,8 +109,8 @@ const createChargingSession = async (data: ChargingHistory, userId: string) => {
         invoiceType: invoice.invoiceType,
       };
       return data;
-    })
-  );
+    });
+  });
 
   const createdChargingInvoicesPromise = prisma.chargingInvoice.createManyAndReturn({
     data: chargingInvoiceData.flat(),

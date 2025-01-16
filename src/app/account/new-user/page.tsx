@@ -1,27 +1,33 @@
-"use client";
-
 import PATHS from "@/app/path-config";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { fetchChargingHistory } from "./action";
-export default function NewUser() {
-  const router = useRouter();
-  const [lastPageLoaded, setLastPageLoaded] = useState(0);
-  const [chargingSessionNumber, setChargingSessionNumber] = useState(0);
-  const [chargingSessionImported, setChargingSessionImported] = useState(0);
+import { redirect } from "next/navigation";
+import { getCookieSession } from "@/utils/cookies-manager";
+import { getUserById } from "@/models/user";
+import { NewUser } from "./container";
 
-  const handleLoadMore = async () => {
-    const data = await fetchChargingHistory(lastPageLoaded + 1);
-    console.log(data);
-    setLastPageLoaded((old) => old + 1);
-    setChargingSessionNumber(data.totalResults);
-    setChargingSessionImported((old) => old + data.chargingSessions);
-  };
+export default async function NewUserPage() {
+  const cookiesSession = await getCookieSession();
+  if (!cookiesSession) return redirect(PATHS.login);
+  const user = await getUserById(cookiesSession.userId);
+  if (!user) return redirect(PATHS.login);
+
+  if (user.termsAndConditionsAcceptedAt && user.firstDownloadCompletedAt) return redirect(PATHS.dashboard);
+
+  // const handleLoadMore = async () => {
+  //   const data = await fetchChargingHistory(lastPageLoaded + 1);
+  //   console.log(data);
+  //   setLastPageLoaded((old) => old + 1);
+  //   setChargingSessionNumber(data.totalResults);
+  //   setChargingSessionImported((old) => old + data.chargingSessions);
+  // };
 
   return (
-    <div>
-      <h1>NewUser</h1>
-      <button onClick={() => router.push(PATHS.home)}>Go to home</button>
+    <div className="flex flex-col items-center justify-center">
+      <div className="overflow-hidden bg-white shadow sm:rounded-md border border-lightGray">
+        <div className="px-4 py-5 sm:p-6">
+          <NewUser user={user} />
+        </div>
+      </div>
+      {/* <button onClick={() => redirect(PATHS.home)}>Go to home</button>
       <button
         onClick={handleLoadMore}
         disabled={chargingSessionImported === chargingSessionNumber && chargingSessionNumber !== 0}
@@ -31,7 +37,7 @@ export default function NewUser() {
       </button>
       <h1>
         Charging session number: {chargingSessionImported}/{chargingSessionNumber}
-      </h1>
+      </h1> */}
     </div>
   );
 }

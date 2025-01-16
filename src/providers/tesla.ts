@@ -123,7 +123,9 @@ export const Tesla = (user: { id: string; region: TeslaApiRegion }, token: { acc
 
   const requestTeslaApi = async <T>(path: string, method: "GET" | "POST" = "GET", data: { body?: unknown; query?: Record<string, string | number> } = {}) => {
     const response = await requestTeslaAiRaw(path, method, data);
+    console.log("TeslaApi response:", response.status);
     if (!response.ok) {
+      console.log("TeslaApi error:", response.statusText);
       throw new Error(response.statusText);
     }
     return response.json() as Promise<T>;
