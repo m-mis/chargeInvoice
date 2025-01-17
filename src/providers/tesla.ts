@@ -4,6 +4,7 @@ import { appUrl } from "@/utils/app";
 import PATHS from "@/app/path-config";
 import { refreshUserSession } from "@/models/user-session";
 import { getUserWithLastSession } from "@/models/user";
+import { sleep } from "@/utils/sleep";
 
 export const MAX_PAGE_SIZE = 50;
 
@@ -121,11 +122,20 @@ export const Tesla = (user: { id: string; region: TeslaApiRegion }, token: { acc
     return response;
   };
 
-  const requestTeslaApi = async <T>(path: string, method: "GET" | "POST" = "GET", data: { body?: unknown; query?: Record<string, string | number> } = {}) => {
+  const requestTeslaApi = async <T>(
+    path: string,
+    method: "GET" | "POST" = "GET",
+    data: { body?: unknown; query?: Record<string, string | number> } = {},
+    retry = 0
+  ) => {
     const response = await requestTeslaAiRaw(path, method, data);
     console.log("TeslaApi response:", response.status);
     if (!response.ok) {
       console.log("TeslaApi error:", response.statusText);
+      if (retry < 5 && [500, 503, 504].includes(response.status)) {
+        await sleep(1000);
+        return requestTeslaApi(path, method, data, retry + 1);
+      }
       throw new Error(response.statusText);
     }
     return response.json() as Promise<T>;
