@@ -15,8 +15,8 @@
     "updateUser": "Mise à jour de votre compte..."
   },
   "ChargeStats": {
-    "numberCharging": "Sessions de recharge",
-    "totalCharging": "Total de recharge",
+    "numberCharging": "Sessions de charge",
+    "totalCharging": "Total de charge",
     "totalKwh": "Total kwh",
     "totalCost": "Prix total",
     "favoriteChargingLocation": "Supercharger favori"

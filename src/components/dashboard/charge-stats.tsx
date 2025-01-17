@@ -16,8 +16,8 @@ export const ChargeStats: FC<{ charges: ChargingSessionWithFeesAndInvoices[] }> 
   const costArray = Object.entries(cost)
     .map(([currency, total]) => ({ currency, total }))
     .sort((a, b) => b.total - a.total);
-  const mainCost = costArray[0];
-  const otherCosts = costArray.slice(1);
+  const mainCost = costArray[0] ?? { currency: "$", total: 0 };
+  const otherCosts = costArray.slice(1) ?? [];
   const chargingLocationOccurrences = charges
     .map((charge) => charge.siteLocationName)
     .filter((location) => location !== null)
@@ -28,11 +28,11 @@ export const ChargeStats: FC<{ charges: ChargingSessionWithFeesAndInvoices[] }> 
   const chargingLocationOccurrencesArray = Object.entries(chargingLocationOccurrences)
     .map(([location, occurrences]) => ({ location, occurrences }))
     .sort((a, b) => b.occurrences - a.occurrences);
-  const mainChargingLocation = chargingLocationOccurrencesArray[0];
+  const mainChargingLocation = chargingLocationOccurrencesArray[0] ?? { location: "Unknown", occurrences: 0 };
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <ChargeStatsItem>
-        <div className="flex flex-col justify-center">
+        <div className="h-full flex flex-col justify-center content-center">
           <h1 className="text-4xl font-bold text-center">{charges.length}</h1>
           <p className="text-center">{t("numberCharging")}</p>
         </div>
@@ -51,7 +51,7 @@ export const ChargeStats: FC<{ charges: ChargingSessionWithFeesAndInvoices[] }> 
         </div>
       </ChargeStatsItem>
       <ChargeStatsItem>
-        <div className="flex flex-col justify-center">
+        <div className="h-full flex flex-col justify-center content-center">
           <h1 className="text-4xl font-bold text-center">
             {mainCost.total.toFixed(2)}
             <span className="text-sm">{mainCost.currency}</span>
