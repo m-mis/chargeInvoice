@@ -14,6 +14,13 @@
     "fetchingSessionsCompleted": "Your charging sessions have been fetched successfully",
     "updateUser": "Updating your account..."
   },
+  "ChargeStats": {
+    "numberCharging": "Charging sessions",
+    "totalCharging": "Total Charging",
+    "totalKwh": "Total kwh",
+    "totalCost": "Total Cost",
+    "favoriteChargingLocation": "fav supercharger"
+  },
   "ErrorPage": {
     "title": "Error",
     "code": {

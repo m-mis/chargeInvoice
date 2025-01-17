@@ -14,6 +14,13 @@
     "fetchingSessionsCompleted": "Vos sessions de recharge ont été récupérées avec succès",
     "updateUser": "Mise à jour de votre compte..."
   },
+  "ChargeStats": {
+    "numberCharging": "Sessions de recharge",
+    "totalCharging": "Total de recharge",
+    "totalKwh": "Total kwh",
+    "totalCost": "Prix total",
+    "favoriteChargingLocation": "Supercharger favori"
+  },
   "ErrorPage": {
     "title": "Error",
     "code": {

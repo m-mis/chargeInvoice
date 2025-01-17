@@ -7,7 +7,6 @@ import { getChargingSessions } from "@/models/charging-session";
 import { getCookieSession } from "@/utils/cookies-manager";
 import { redirect } from "next/navigation";
 import PATHS from "../path-config";
-import { ChargesTable } from "@/components/dashboard/charge-table";
 import { ChargeStats } from "@/components/dashboard/charge-stats";
 
 export default async function Page() {
@@ -19,7 +18,6 @@ export default async function Page() {
   return (
     <div>
       <ChargeStats charges={charges} />
-      <ChargesTable charges={charges} />
     </div>
   );
 }
